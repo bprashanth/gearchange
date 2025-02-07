@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  poller:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: poller
+    volumes:
+      - ${HOME}/mongo/data:/data
+      - ${HOME}/mongo/log:/var/log/mongodb
+    command: [ "supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf" ]
+    env_file:
+      - .env
