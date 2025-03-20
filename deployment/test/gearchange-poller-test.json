@@ -1,0 +1,56 @@
+{
+  "family": "gearchange-poller-test",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": ["FARGATE"],
+  "executionRoleArn": "arn:aws:iam::024848460644:role/ecsTaskExecutionRole",
+  "taskRoleArn": "arn:aws:iam::024848460644:role/ecsMinimalTaskRole",
+  "cpu": "256",
+  "memory": "512",
+  "containerDefinitions": [
+    {
+      "name": "chatbot",
+      "image": "bprashanth/cc-gearchange-poller:0.7",
+      "essential": true,
+      "command": [
+        "supervisord",
+	"-c",
+        "/etc/supervisor/conf.d/supervisord.conf"
+      ],
+      "mountPoints": [
+        {
+          "sourceVolume": "mongo-efs",
+          "containerPath": "/data/db",
+          "readOnly": false
+        }
+      ],
+      "portMappings": [
+        {
+          "containerPort": 27017,
+          "protocol": "tcp"
+        }
+      ],
+      "environment": [
+        {
+          "name": "AWS_REGION",
+          "value": "ap-south-1"
+        }
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/cc",
+          "awslogs-region": "ap-south-1",
+          "awslogs-stream-prefix": "gearchange-poller-test"
+        }
+      }
+    }
+  ],
+  "volumes": [
+    {
+      "name": "mongo-efs",
+      "efsVolumeConfiguration": {
+        "fileSystemId": "fs-010c38cd2b3bbadd4"
+      }
+    }
+  ]
+}
